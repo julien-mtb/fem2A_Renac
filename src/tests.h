@@ -76,7 +76,14 @@ namespace FEM2A {
         	}
         	std::cout << "poids quadrature : " << poids2 << std::endl;
         	return true;
+        	
+        
         }
-
+	bool test_mapping(){
+        	std::cout << "coucou2"<< std::endl;
+        	// std::vector< vertex > mesh.vertices_
+        	
+        	
+        }
     }
 }
