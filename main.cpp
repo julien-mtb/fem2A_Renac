@@ -11,6 +11,7 @@
 /* Global variables */
 std::vector< std::string > arguments;
 
+
 /* To parse command line arguments */
 bool flag_is_used(
     const std::string& flag,
@@ -31,10 +32,12 @@ void run_tests()
     const bool t_opennl = true;
     const bool t_lmesh = true;
     const bool t_io = true;
+    const bool t_quad = true;
 
     if( t_opennl ) test_opennl();
     if( t_lmesh ) Tests::test_load_mesh();
     if( t_io ) Tests::test_load_save_mesh();
+    if(t_quad) Tests::test_quadrature();
 }
 
 void run_simu()
@@ -51,6 +54,7 @@ void run_simu()
 }
 
 int main( int argc, const char * argv[] )
+/*argc : argument count, le nombre d'arguments, argv[] : pointeur vers un tableau des arguments (chaines de caractères) */
 {
     /* Command line parsing */
     for( int i = 1; i < argc; ++i ) {

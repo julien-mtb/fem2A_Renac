@@ -10,8 +10,10 @@ namespace FEM2A {
         double x ;
         double y ;
     } ;
+    // Vertex défini par sa position en 2D
     typedef vertex vec2 ;
 
+	// Déclaration de la classe mesh
     class Mesh {
         public:
             Mesh() ;
@@ -21,9 +23,13 @@ namespace FEM2A {
             int nb_triangles() const ;
 
             vertex get_vertex( int vertex_index ) const ;
+            // Renvoie un vertex en fonction de son index
             vertex get_edge_vertex( int edge_index, int vertex_local_index ) const ;
+            // Renvoie les vertex du bord
             vertex get_triangle_vertex( int triangle_index, int vertex_local_index ) const ;
+            // Renvoie un vertex dans un triangle donné, associé à un vertex du triangle principal
 
+	// Renvoie l'index d'un vertex
             int get_edge_vertex_index( int edge_index, int vertex_local_index ) const ;
             int get_triangle_vertex_index( int triangle_index, int vertex_local_index ) const ;
 

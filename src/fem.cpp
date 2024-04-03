@@ -23,6 +23,7 @@ namespace FEM2A {
     /****************************************************************/
     int Quadrature::nb_points() const
     {
+    // renvoie le nb de points de la quadrature
         return wxy_.size() / 3 ;
     }
 
@@ -37,6 +38,7 @@ namespace FEM2A {
 
     double Quadrature::weight( int i ) const
     {
+    // weight renvoie le poids numéro i de la quadrature
         assert( i < nb_points() ) ;
         return wxy_[3 * i + 0] ;
     }
@@ -135,6 +137,7 @@ namespace FEM2A {
         std::cout << "[ElementMapping] constructor for element " << i << " ";
         if ( border ) std::cout << "(border)";
         std::cout << '\n';
+        // vertices_(
         // TODO
     }
 
