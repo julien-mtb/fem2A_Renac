@@ -104,6 +104,15 @@ namespace FEM2A {
         	
         	ElementMapping mapping = ElementMapping(mesh, false, 4);
         	
+        	vertex point1{0.2, 0.4};
+        	
+        	vertex image_point1;
+        	
+        	image_point1 = mapping.transform(point1);
+        	
+        	std::cout << "Position x : " << image_point1.x << " ; position y : " << image_point1.y << std::endl;
+        	
+        	
         	return true;
         }
     }

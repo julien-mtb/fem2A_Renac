@@ -168,8 +168,22 @@ namespace FEM2A {
     vertex ElementMapping::transform( vertex x_r ) const
     {
         std::cout << "[ElementMapping] transform reference to world space" << '\n';
+        
         // TODO
         vertex r ;
+        double eta = x_r.y;
+        double ksi = x_r.x;
+        double r_x, r_y;
+        
+        if (border_){
+        r.x = (1-ksi - eta)*vertices_[0].x + ksi*vertices_[1].x;
+        r.y = (1-ksi - eta)*vertices_[0].y + ksi*vertices_[1].y;
+        }
+        else{
+        r.x = (1-ksi - eta)*vertices_[0].x + ksi*vertices_[1].x + eta*vertices_[2].x;
+        r.y = (1-ksi - eta)*vertices_[0].y + ksi*vertices_[1].y + eta*vertices_[2].y;
+        }
+
         return r ;
     }
 
