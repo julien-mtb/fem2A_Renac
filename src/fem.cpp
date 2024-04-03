@@ -137,32 +137,32 @@ namespace FEM2A {
     // sinon, on est dans un triangle
 
         std::cout << "[ElementMapping] constructor for element " << i << " ";
-        /*if ( border_ ){
-        	std::cout << "(border)";
+        if ( border_ ){
+        	std::cout << "(border)" << std::endl;
                 vertex vertice0 = M.get_edge_vertex(i, 0);
         	vertex vertice1 = M.get_edge_vertex(i, 1);
-        	/*
+        
         	std::vector< vertex > vertices_all{vertice0, vertice1};
-        	vertices_(vertices_all);
+        	vertices_ = vertices_all;
         	for (int i =0; i < vertices_all.size(); ++i){
-        		std::cout << "vertice nb " << vertices_all.at(i) << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
+        		std::cout << "vertice nb " << i << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
+        	}
         }
-        */
-        /*
+
         else{
-        	std::cout << '\n';
+        	std::cout << "(triangle)" << std::endl;
         	vertex vertice0 = M.get_triangle_vertex(i, 0);
         	vertex vertice1 = M.get_triangle_vertex(i, 1);
         	vertex vertice2 = M.get_triangle_vertex(i, 2);
-        	std::cout << vertice0.x << " " << vertice0.y;
-        	/*
+ 
         	std::vector< vertex > vertices_all{vertice0, vertice1, vertice2};
-        	vertices_(vertices_all);
+        	vertices_ = vertices_all;
         	for (int i =0; i < vertices_all.size(); ++i){
-        		std::cout << "vertice nb " << vertices_all.at(i) << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
-        }
-        */
+        		std::cout << "vertice nb " << i << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
+        	}
+        
         // TODO
+    }
     }
 
     vertex ElementMapping::transform( vertex x_r ) const

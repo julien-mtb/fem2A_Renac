@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <stdlib.h>
 
+
 namespace FEM2A {
     namespace Tests {
 
@@ -85,17 +86,24 @@ namespace FEM2A {
             	mesh.load("data/square.mesh");
             	mesh.save("data/square.mesh");
             	
-        	std::cout << "coucou2"<< std::endl;
+        	std::cout << "Données des vertices du triangle numéro 4 du maillage square.mesh."<< std::endl;
         	
         	
         	vertex v0 = mesh.get_triangle_vertex(4, 0);
         	vertex v1 = mesh.get_triangle_vertex(4, 1);
         	vertex v2 = mesh.get_triangle_vertex(4, 2);
-
+        	
+        	std::vector< vertex> vecteur1{v0, v1, v2};
+        	for (int i =0; i < vecteur1.size(); ++i){
+        		std::cout << "vertice nb " << i << " : x = " << vecteur1[i].x << " y = "<< vecteur1[i].y << std::endl;
+		}
         	
         	std::cout << "v0 : x = " << v0.x << " y = " << v0.y << std::endl;
         	std::cout << "v1 : x = " << v1.x << " y = " << v1.y << std::endl;
         	std::cout << "v2 : x = " << v2.x << " y = " << v2.y << std::endl;
+        	
+        	ElementMapping mapping = ElementMapping(mesh, false, 4);
+        	
         	return true;
         }
     }
