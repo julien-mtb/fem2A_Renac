@@ -79,11 +79,24 @@ namespace FEM2A {
         	
         
         }
+        
 	bool test_mapping(){
+		Mesh mesh;
+            	mesh.load("data/square.mesh");
+            	mesh.save("data/square.mesh");
+            	
         	std::cout << "coucou2"<< std::endl;
-        	// std::vector< vertex > mesh.vertices_
         	
         	
+        	vertex v0 = mesh.get_triangle_vertex(4, 0);
+        	vertex v1 = mesh.get_triangle_vertex(4, 1);
+        	vertex v2 = mesh.get_triangle_vertex(4, 2);
+
+        	
+        	std::cout << "v0 : x = " << v0.x << " y = " << v0.y << std::endl;
+        	std::cout << "v1 : x = " << v1.x << " y = " << v1.y << std::endl;
+        	std::cout << "v2 : x = " << v2.x << " y = " << v2.y << std::endl;
+        	return true;
         }
     }
 }

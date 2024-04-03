@@ -132,36 +132,36 @@ namespace FEM2A {
     /* Implementation of ElementMapping */
     /****************************************************************/
     ElementMapping::ElementMapping( const Mesh& M, bool border, int i )
-        : border_( border )
+        : border_( border ){
     // si border est true, on est sur un segment
     // sinon, on est dans un triangle
-    {
+
         std::cout << "[ElementMapping] constructor for element " << i << " ";
-        if ( border ){
+        /*if ( border_ ){
         	std::cout << "(border)";
-                vertex vertices0 = M.get_edge_vertex(i, 0);
-        	vertex vertices1 = M.get_edge_vertex(i, 1);
+                vertex vertice0 = M.get_edge_vertex(i, 0);
+        	vertex vertice1 = M.get_edge_vertex(i, 1);
         	/*
-        	std::vector< vertex > vertices_all{vertices0, vertices1, vertices2};
+        	std::vector< vertex > vertices_all{vertice0, vertice1};
         	vertices_(vertices_all);
         	for (int i =0; i < vertices_all.size(); ++i){
         		std::cout << "vertice nb " << vertices_all.at(i) << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
-        	*/
         }
+        */
+        /*
         else{
         	std::cout << '\n';
-        	vertex vertices0 = M.get_triangle_vertex(i, 0);
-        	vertex vertices1 = M.get_triangle_vertex(i, 1);
-        	vertex vertices2 = M.get_triangle_vertex(i, 2);
-        	std::cout << vertices0.x << " " << vertices0.y;
-        /*
-        std::vector< vertex > vertices_all{vertices0, vertices1, vertices2};
-        vertices_(vertices_all);
-        for (int i =0; i < vertices_all.size(); ++i){
-        	std::cout << "vertice nb " << vertices_all.at(i) << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
-        	*/
+        	vertex vertice0 = M.get_triangle_vertex(i, 0);
+        	vertex vertice1 = M.get_triangle_vertex(i, 1);
+        	vertex vertice2 = M.get_triangle_vertex(i, 2);
+        	std::cout << vertice0.x << " " << vertice0.y;
+        	/*
+        	std::vector< vertex > vertices_all{vertice0, vertice1, vertice2};
+        	vertices_(vertices_all);
+        	for (int i =0; i < vertices_all.size(); ++i){
+        		std::cout << "vertice nb " << vertices_all.at(i) << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
         }
-        }
+        */
         // TODO
     }
 
