@@ -3,6 +3,7 @@
 #include "mesh.h"
 #include "fem.h"
 #include "solver.h"
+// #include "simu.h"
 
 #include <assert.h>
 #include <iostream>
@@ -81,6 +82,11 @@ namespace FEM2A {
         
         }
         
+        double unit_fct( vertex v )
+        {
+            return 1.;
+        }
+        
 	bool test_mapping(){
 		Mesh mesh;
             	mesh.load("data/square.mesh");
@@ -143,7 +149,33 @@ namespace FEM2A {
         	int order = 1;
         	ShapeFunctions functions = ShapeFunctions(dim, order);
         	*/
+        	
+        	
+        	DenseMatrix Ke;
+        	Ke.set_size(3, 3);
+        	ShapeFunctions ref_functions(2, 1);
+        	Quadrature quadrature = quadrature.get_quadrature(6);
+        	assemble_elementary_matrix(mapping, ref_functions, quadrature, unit_fct, Ke);
+        	
+        	std::cout << "calcul de Ke : " << std::endl;
+        	
+
+        	
+        	for (int i = 0; i<3; i++){
+        		for (int j =0; j<3; j++) {
+        			std::cout << Ke.get(i, j) << " ";
+        		}
+        		std::cout << "" << std::endl;
+        	}
+        	
+        	SparseMatrix K(mesh.nb_vertices());
+        	int t = 4;
+        	local_to_global_matrix(mesh, t, Ke, K);
+        	
         	return true;
         }
     }
+
 }
+
+        

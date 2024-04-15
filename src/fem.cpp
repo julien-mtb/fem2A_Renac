@@ -1,5 +1,6 @@
 #include "fem.h"
 #include "mesh.h"
+// #include "simu.h"
 
 #include <iomanip>
 #include <iostream>
@@ -188,38 +189,38 @@ namespace FEM2A {
 
     DenseMatrix ElementMapping::jacobian_matrix( vertex x_r ) const
     {
-        std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
+        // std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
         // TODO
         DenseMatrix J;
         if (border_){
+        	J.set_size(2, 1);
+        	J.set(0, 0, vertices_[1].x - vertices_[0].x);
+        	J.set(1, 0, vertices_[1].y - vertices_[0].y);
+        }
+        else{
         	J.set_size(2, 2);
         	J.set(0, 0, vertices_[1].x - vertices_[0].x);
         	J.set(0, 1, vertices_[2].x - vertices_[0].x);
         	J.set(1, 0, vertices_[1].y - vertices_[0].y);
         	J.set(1, 1, vertices_[2].y - vertices_[0].y);
+        	
         }
-        /*
-        else{
-        	J.set_size(2, 1);
-        	J.set(0, 0, vertices_[1].x - vertices_[0].x);
-        	J.set(1, 0, vertices_[1].y - vertices_[0].y);
-        }
-        */
         return J;
     }
 
     double ElementMapping::jacobian( vertex x_r ) const
     {
-        std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
+        // std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
         // TODO
         DenseMatrix J = jacobian_matrix(x_r);
         double determinant;
-        if (border_){
-        	determinant = J.get(0, 0)*J.get(1, 1) - J.get(1, 0)*J.get(0, 1);
+        if (border_) {
+        	determinant = pow(pow(J.get(0, 0), 2) + pow(J.get(1, 0), 2), 1/2);
         }
         
-        else{
-       		determinant = pow(pow(J.get(0, 0), 2) + pow(J.get(1, 0), 2), 1/2);
+        else {
+        	determinant = J.get(0, 0)*J.get(1, 1) - J.get(1, 0)*J.get(0, 1);
+       		
         }
         // return 0;
         return determinant;
@@ -231,13 +232,14 @@ namespace FEM2A {
     ShapeFunctions::ShapeFunctions( int dim, int order )
         : dim_( dim ), order_( order )
     {
-        std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
+        // std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
+        assert(dim_ < 3);
         // TODO
     }
 
     int ShapeFunctions::nb_functions() const
     {
-        std::cout << "[ShapeFunctions] number of functions" << '\n';
+        // std::cout << "[ShapeFunctions] number of functions" << '\n';
         ///*
         if (dim_ == 1) return 2;
         if (dim_ == 2) return 3;
@@ -248,7 +250,7 @@ namespace FEM2A {
 
     double ShapeFunctions::evaluate( int i, vertex x_r ) const
     {
-        std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
+        // std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
         ///*
         if (i==0) return 1-x_r.x - x_r.y;
         if (i==1) return x_r.x;
@@ -260,7 +262,7 @@ namespace FEM2A {
 
     vec2 ShapeFunctions::evaluate_grad( int i, vertex x_r ) const
     {
-        std::cout << "[ShapeFunctions] evaluate gradient shape function " << i << '\n';
+        // std::cout << "[ShapeFunctions] evaluate gradient shape function " << i << '\n';
         vec2 g ;
         ///*
         if (dim_==1){
@@ -325,6 +327,18 @@ namespace FEM2A {
         DenseMatrix& Ke )
     {
         std::cout << "compute elementary matrix" << '\n';
+        double scal;
+        for (int i = 0; i < reference_functions.nb_functions(); i++){
+        	for(int j = 0; j < reference_functions.nb_functions(); j++){
+        		scal = 0;
+        		for (int q = 0; q < quadrature.nb_points(); q++){
+        			vertex v = quadrature.point(q);
+        			scal = dot(elt_mapping.jacobian_matrix(v).invert_2x2().transpose().mult_2x2_2(reference_functions.evaluate_grad(i, v)), elt_mapping.jacobian_matrix(v).invert_2x2().transpose().mult_2x2_2(reference_functions.evaluate_grad(j, v)));
+        			Ke.add(i, j, quadrature.weight(q)*coefficient(v)*scal*elt_mapping.jacobian(v)); 
+        				
+        		}
+        	}
+        }
         // TODO
     }
 
@@ -335,6 +349,21 @@ namespace FEM2A {
         SparseMatrix& K )
     {
         std::cout << "Ke -> K" << '\n';
+        
+        std::cout << "Point 0, numérotation globale : " << M.get_triangle_vertex_index(t, 0) << std::endl;
+       	std::cout << "Point 1, numérotation globale : " << M.get_triangle_vertex_index(t, 1) << std::endl;
+        std::cout << "Point 2, numérotation globale : " << M.get_triangle_vertex_index(t, 2) << std::endl;
+	///*
+        int nb_lignes = Ke.height();
+        int nb_colonnes = Ke.width();
+        for ( int i = 0; i < nb_lignes; i++){
+        	for (int j = 0; j <= i; j++){
+        		K.add(M.get_triangle_vertex_index(t, i), M.get_triangle_vertex_index(t, j), Ke.get(i, j));
+        		
+        	
+        	}
+        }
+        //*/
         // TODO
     }
 
