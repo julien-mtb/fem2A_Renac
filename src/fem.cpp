@@ -136,30 +136,30 @@ namespace FEM2A {
     // si border est true, on est sur un segment
     // sinon, on est dans un triangle
 
-        std::cout << "[ElementMapping] constructor for element " << i << " ";
+        // std::cout << "[ElementMapping] constructor for element " << i << " ";
         if ( border_ ){
-        	std::cout << "(border)" << std::endl;
+        	// std::cout << "(border)" << std::endl;
                 vertex vertice0 = M.get_edge_vertex(i, 0);
         	vertex vertice1 = M.get_edge_vertex(i, 1);
         
         	std::vector< vertex > vertices_all{vertice0, vertice1};
         	vertices_ = vertices_all;
-        	for (int i =0; i < vertices_all.size(); ++i){
-        		std::cout << "vertice nb " << i << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
-        	}
+        	// for (int i =0; i < vertices_all.size(); ++i){
+        	//	std::cout << "vertice nb " << i << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
+        	//}
         }
 
         else{
-        	std::cout << "(triangle)" << std::endl;
+        	// std::cout << "(triangle)" << std::endl;
         	vertex vertice0 = M.get_triangle_vertex(i, 0);
         	vertex vertice1 = M.get_triangle_vertex(i, 1);
         	vertex vertice2 = M.get_triangle_vertex(i, 2);
  
         	std::vector< vertex > vertices_all{vertice0, vertice1, vertice2};
         	vertices_ = vertices_all;
-        	for (int i =0; i < vertices_all.size(); ++i){
-        		std::cout << "vertice nb " << i << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
-        	}
+        	// for (int i =0; i < vertices_all.size(); ++i){
+        	//	std::cout << "vertice nb " << i << " :  x = " << vertices_all[i].x << " y = "<< vertices_all[i].y << std::endl;
+        	//}
         
         // TODO
     }
@@ -167,21 +167,20 @@ namespace FEM2A {
 
     vertex ElementMapping::transform( vertex x_r ) const
     {
-        std::cout << "[ElementMapping] transform reference to world space" << '\n';
-        
-        // TODO
+        // std::cout << "[ElementMapping] transform reference to world space" << '\n';
+
         vertex r ;
         double eta = x_r.y;
         double ksi = x_r.x;
         double r_x, r_y;
         
         if (border_){
-        r.x = (1-ksi - eta)*vertices_[0].x + ksi*vertices_[1].x;
-        r.y = (1-ksi - eta)*vertices_[0].y + ksi*vertices_[1].y;
+        	r.x = (1-ksi - eta)*vertices_[0].x + ksi*vertices_[1].x;
+        	r.y = (1-ksi - eta)*vertices_[0].y + ksi*vertices_[1].y;
         }
         else{
-        r.x = (1-ksi - eta)*vertices_[0].x + ksi*vertices_[1].x + eta*vertices_[2].x;
-        r.y = (1-ksi - eta)*vertices_[0].y + ksi*vertices_[1].y + eta*vertices_[2].y;
+        	r.x = (1-ksi - eta)*vertices_[0].x + ksi*vertices_[1].x + eta*vertices_[2].x;
+        	r.y = (1-ksi - eta)*vertices_[0].y + ksi*vertices_[1].y + eta*vertices_[2].y;
         }
 
         return r ;
@@ -191,15 +190,39 @@ namespace FEM2A {
     {
         std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
         // TODO
-        DenseMatrix J ;
-        return J ;
+        DenseMatrix J;
+        if (border_){
+        	J.set_size(2, 2);
+        	J.set(0, 0, vertices_[1].x - vertices_[0].x);
+        	J.set(0, 1, vertices_[2].x - vertices_[0].x);
+        	J.set(1, 0, vertices_[1].y - vertices_[0].y);
+        	J.set(1, 1, vertices_[2].y - vertices_[0].y);
+        }
+        /*
+        else{
+        	J.set_size(2, 1);
+        	J.set(0, 0, vertices_[1].x - vertices_[0].x);
+        	J.set(1, 0, vertices_[1].y - vertices_[0].y);
+        }
+        */
+        return J;
     }
 
     double ElementMapping::jacobian( vertex x_r ) const
     {
         std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
         // TODO
-        return 0. ;
+        DenseMatrix J = jacobian_matrix(x_r);
+        double determinant;
+        if (border_){
+        	determinant = J.get(0, 0)*J.get(1, 1) - J.get(1, 0)*J.get(0, 1);
+        }
+        
+        else{
+       		determinant = pow(pow(J.get(0, 0), 2) + pow(J.get(1, 0), 2), 1/2);
+        }
+        // return 0;
+        return determinant;
     }
 
     /****************************************************************/
@@ -215,6 +238,10 @@ namespace FEM2A {
     int ShapeFunctions::nb_functions() const
     {
         std::cout << "[ShapeFunctions] number of functions" << '\n';
+        ///*
+        if (dim_ == 1) return 2;
+        if (dim_ == 2) return 3;
+        //*/
         // TODO
         return 0 ;
     }
@@ -222,6 +249,11 @@ namespace FEM2A {
     double ShapeFunctions::evaluate( int i, vertex x_r ) const
     {
         std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
+        ///*
+        if (i==0) return 1-x_r.x - x_r.y;
+        if (i==1) return x_r.x;
+        if (i==2) return x_r.y;
+        //*/
         // TODO
         return 0. ; // should not be reached
     }
@@ -229,8 +261,56 @@ namespace FEM2A {
     vec2 ShapeFunctions::evaluate_grad( int i, vertex x_r ) const
     {
         std::cout << "[ShapeFunctions] evaluate gradient shape function " << i << '\n';
-        // TODO
         vec2 g ;
+        ///*
+        if (dim_==1){
+        	switch(i) {
+        		case 0:
+        			g.x = -1.; break;
+        		case 1:
+        			g.x = 1.; break;
+        	}
+        	g.y = 0.;
+        }
+        else {
+        	switch(i) {
+        		case 0:
+        			g.x = -1.; g.y = -1.; break;
+        		case 1:
+        			g.x = 1.; g.y = 0.; break;
+        		case 2:
+        			g.x = 0.; g.y = 1.; break;
+        	}
+        }
+        		
+        	
+        /*
+        	if (i==0){
+        		g.x = -1;
+        		g.y = 0;
+        	}
+        	if (i==1){
+        		g.x = 1;
+        		g.y = 0;
+        	}
+       
+        }
+        else {
+        	if (i==0){
+        		g.x = -1;
+        		g.y = -1;
+        	}
+        	if (i==1){
+        		g.x = 1;
+        		g.y = 0;
+        	}
+        	if (i==2){
+        		g.x = 0;
+        		g.y = 1;
+        	}
+        }
+        */
+        //*/
         return g ;
     }
 

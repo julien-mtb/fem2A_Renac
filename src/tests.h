@@ -112,7 +112,37 @@ namespace FEM2A {
         	
         	std::cout << "Position x : " << image_point1.x << " ; position y : " << image_point1.y << std::endl;
         	
+        	std::cout << "" << std::endl;
+        	std::cout << "Tests sur la matrice Jacobienne pour le triangle;" << std::endl;
+        	std::cout << "" << std::endl;
         	
+        	DenseMatrix J = mapping.jacobian_matrix(point1);
+        	std::cout << "Matrice Jacobienne : " << std::endl;
+        	std::cout << J.get(0, 0) << " " << J.get(0, 1) << std::endl;
+        	std::cout << J.get(1, 0) << " " << J.get(1, 1) << std::endl;
+        	
+        	std::cout << "" << std::endl;
+        	
+        	std::cout << "Determinant : " << std::endl;
+        	std::cout << mapping.jacobian(point1) << std::endl;
+        	
+        	std::cout << "" << std::endl;
+        	std::cout << "Tests sur la matrice Jacobienne pour un segment;" << std::endl;
+        	std::cout << "" << std::endl;
+        	/*
+        	
+        	ElementMapping mapping2 = ElementMapping(mesh, true, 4);
+        	vertex v0_ = mesh.get_edge_vertex(4, 0);
+        	vertex v1_ = mesh.get_edge_vertex(4, 1);
+        	std::cout << "v0 : x = " << v0_.x << " y = " << v0_.y << std::endl;
+        	std::cout << "v1 : x = " << v1_.x << " y = " << v1_.y << std::endl;
+        	
+        	*/
+        	/*
+        	int dim = 2;
+        	int order = 1;
+        	ShapeFunctions functions = ShapeFunctions(dim, order);
+        	*/
         	return true;
         }
     }
