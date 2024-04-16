@@ -189,6 +189,31 @@ namespace FEM2A {
         	
         	return true;
         }
+        
+        bool test_Ke(){
+        
+        	Mesh mesh;
+            	mesh.load("data/square.mesh");
+            	ElementMapping my_map(mesh, false, 4);
+            	ShapeFunctions my_shpfct(2, 1);
+            	Quadrature my_quad = Quadrature::get_quadrature(2);
+            	DenseMatrix Ke;
+            	assemble_elementary_matrix(my_map, my_shpfct, my_quad, unit_fct, Ke);
+            	Ke.print();
+            	SparseMatrix K_glob(mesh.nb_vertices());
+            	local_to_global_matrix(mesh, 4, Ke, K_glob);
+            	K_glob.print();
+            	
+            	/*
+            	std::vector <bool> attribute_is_dirichlet;
+            	std::vector <double> values;
+            	SparseMatrix K;
+            	std::vector <double> F;
+            	
+            	apply_dirichlet_conditions(attribute_is_dirichlet, values, K, F);
+        	*/
+        	return true;
+        }
     }
 
 }

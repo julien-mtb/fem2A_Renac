@@ -136,8 +136,9 @@ namespace FEM2A {
         : border_( border ){
     // si border est true, on est sur un segment
     // sinon, on est dans un triangle
-
-        // std::cout << "[ElementMapping] constructor for element " << i << " ";
+	/*
+        std::cout << "[ElementMapping] constructor for element " << i << " ";
+        */
         if ( border_ ){
         	// std::cout << "(border)" << std::endl;
                 vertex vertice0 = M.get_edge_vertex(i, 0);
@@ -168,7 +169,9 @@ namespace FEM2A {
 
     vertex ElementMapping::transform( vertex x_r ) const
     {
-        // std::cout << "[ElementMapping] transform reference to world space" << '\n';
+    	/*
+        std::cout << "[ElementMapping] transform reference to world space" << '\n';
+        */
 
         vertex r ;
         double eta = x_r.y;
@@ -189,7 +192,9 @@ namespace FEM2A {
 
     DenseMatrix ElementMapping::jacobian_matrix( vertex x_r ) const
     {
-        // std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
+    	/*
+        std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
+        */
         // TODO
         DenseMatrix J;
         if (border_){
@@ -210,14 +215,18 @@ namespace FEM2A {
 
     double ElementMapping::jacobian( vertex x_r ) const
     {
-        // std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
+    	/*
+        std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
+        */
         // TODO
         DenseMatrix J = jacobian_matrix(x_r);
         double determinant = 0;
         if (border_) {
-        	// std::cout << "J[0] : " << J.get(0, 0) << " , J[1] : " << J.get(1, 0) << std::endl;
-        	// std::cout << "calcul pow : " << pow(J.get(0, 0), 2) << " ; " << pow(J.get(1, 0), 2) << std::endl;
-        	// std::cout << "calcul final : " << pow(pow(J.get(0, 0), 2) + pow(J.get(1, 0), 2), 0.5) << std::endl;
+        	/*
+        	std::cout << "J[0] : " << J.get(0, 0) << " , J[1] : " << J.get(1, 0) << std::endl;
+        	std::cout << "calcul pow : " << pow(J.get(0, 0), 2) << " ; " << pow(J.get(1, 0), 2) << std::endl;
+        	std::cout << "calcul final : " << pow(pow(J.get(0, 0), 2) + pow(J.get(1, 0), 2), 0.5) << std::endl;
+        	*/
         	determinant = pow(pow(J.get(0, 0), 2) + pow(J.get(1, 0), 2), 0.5);
         	// std::cout << "det de vecteurs, on a det = " << determinant << std::endl;
         }
@@ -236,14 +245,18 @@ namespace FEM2A {
     ShapeFunctions::ShapeFunctions( int dim, int order )
         : dim_( dim ), order_( order )
     {
-        // std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
+    	/*
+        std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
+        */
         assert(dim_ < 3);
         // TODO
     }
 
     int ShapeFunctions::nb_functions() const
     {
-        // std::cout << "[ShapeFunctions] number of functions" << '\n';
+    	/*
+        std::cout << "[ShapeFunctions] number of functions" << '\n';
+        */
         ///*
         if (dim_ == 1) return 2;
         if (dim_ == 2) return 3;
@@ -254,7 +267,9 @@ namespace FEM2A {
 
     double ShapeFunctions::evaluate( int i, vertex x_r ) const
     {
-        // std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
+    	/*
+        std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
+        */
         ///*
         if (dim_ == 2) {
         	if (i==0) return 1-x_r.x - x_r.y;
@@ -273,7 +288,9 @@ namespace FEM2A {
 
     vec2 ShapeFunctions::evaluate_grad( int i, vertex x_r ) const
     {
-        // std::cout << "[ShapeFunctions] evaluate gradient shape function " << i << '\n';
+    	/*
+        std::cout << "[ShapeFunctions] evaluate gradient shape function " << i << '\n';
+        */
         vec2 g ;
         ///*
         if (dim_==1){
@@ -295,35 +312,6 @@ namespace FEM2A {
         			g.x = 0.; g.y = 1.; break;
         	}
         }
-        		
-        	
-        /*
-        	if (i==0){
-        		g.x = -1;
-        		g.y = 0;
-        	}
-        	if (i==1){
-        		g.x = 1;
-        		g.y = 0;
-        	}
-       
-        }
-        else {
-        	if (i==0){
-        		g.x = -1;
-        		g.y = -1;
-        	}
-        	if (i==1){
-        		g.x = 1;
-        		g.y = 0;
-        	}
-        	if (i==2){
-        		g.x = 0;
-        		g.y = 1;
-        	}
-        }
-        */
-        //*/
         return g ;
     }
 
@@ -337,10 +325,14 @@ namespace FEM2A {
         double (*coefficient)(vertex),
         DenseMatrix& Ke )
     {
+    	/*
         std::cout << "compute elementary matrix" << '\n';
+        */
         double scal;
+        Ke.set_size(reference_functions.nb_functions(), reference_functions.nb_functions());
         for (int i = 0; i < reference_functions.nb_functions(); i++){
         	for(int j = 0; j < reference_functions.nb_functions(); j++){
+        		Ke.set(i, j, 0);
         		scal = 0;
         		for (int q = 0; q < quadrature.nb_points(); q++){
         			vertex v = quadrature.point(q);
@@ -359,11 +351,13 @@ namespace FEM2A {
         const DenseMatrix& Ke,
         SparseMatrix& K )
     {
+    	/*
         std::cout << "Ke -> K" << '\n';
         
         std::cout << "Point 0, numérotation globale : " << M.get_triangle_vertex_index(t, 0) << std::endl;
        	std::cout << "Point 1, numérotation globale : " << M.get_triangle_vertex_index(t, 1) << std::endl;
         std::cout << "Point 2, numérotation globale : " << M.get_triangle_vertex_index(t, 2) << std::endl;
+        */
 	///*
         int nb_lignes = Ke.height();
         int nb_colonnes = Ke.width();
@@ -385,7 +379,9 @@ namespace FEM2A {
         double (*source)(vertex),
         std::vector< double >& Fe )
     {
+        /*
         std::cout << "compute elementary vector (source term)" << '\n';
+        */
         // TODO
         double calcul;
         for (int i = 0; i < reference_functions.nb_functions(); i++) {
@@ -405,7 +401,9 @@ namespace FEM2A {
         double (*neumann)(vertex),
         std::vector< double >& Fe )
     {
+    	/*
         std::cout << "compute elementary vector (neumann condition)" << '\n';
+        */
         // TODO
         double calcul;
         for (int i = 0; i < reference_functions_1D.nb_functions(); i++) {
@@ -426,11 +424,15 @@ namespace FEM2A {
         std::vector< double >& Fe,
         std::vector< double >& F )
     {
+    	/*
         std::cout << "Fe -> F" << '\n';
+        */
+        /*
         int nb_lignes = Fe.size();
         for (int l = 0; i < nb_lignes; i++){
         	F[M.get_edge_vertex_index(i, l)] += Fe[l];
         }
+        */
         // TODO
         
     }
@@ -444,7 +446,25 @@ namespace FEM2A {
     {
         std::cout << "apply dirichlet boundary conditions" << '\n';
         // TODO
-        int P = 10000;
+        int Pen_coeff = 10000;
+        // La condition de dirichlet est imposée pour deux points, il faut donc gérer si on a déja pris en compte ou pas
+        // Pour ne pas passer deux fois sur les points -> utilisation d'un vecteur de booléens
+        std::vector <bool> processed_vertices(values.size(), false);
+        assert(values.size() == M.nb_vertices());
+        for (int edge = 0; edge < M.nb_vertices(); edge++) {
+        	int edge_attribute = M.get_edge_attribute(edge);
+        	if (attribute_is_dirichlet[edge_attribute]) {
+        		for (int vertice = 0; vertice < 2; vertice++){
+        			int vertex_index = M.get_edge_vertex_index(edge, vertice);
+        			if ( !processed_vertices[vertex_index]) {
+        				processed_vertices[vertex_index] = true;
+        				K.add(vertex_index, vertex_index, Pen_coeff);
+        				F[vertex_index] += Pen_coeff*values[vertex_index];
+        			}
+        		}
+        	}
+        
+        }
         
     }
 
@@ -459,6 +479,8 @@ namespace FEM2A {
     {
         std::cout << "solve poisson problem" << '\n';
         // TODO
+        
+        
     }
 
 }

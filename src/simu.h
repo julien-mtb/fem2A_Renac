@@ -39,6 +39,24 @@ namespace FEM2A {
                 std::cout << " with lots of printed details..." << std::endl;
             }
             std::cout << "TO BE IMPLEMENTED !!!" << std::endl;
+            Mesh mesh;
+            mesh.load(mesh_filename);
+            std::vector <bool> attribute_is_dirichlet;
+            std::cout << " Attribut max : " << mesh.get_attr_max() << std::endl;
+            
+            for (int num_edge = 0; num_edge < mesh.nb_edges; num_edge++){
+            	std::cout << 
+            }
+            
+            /*
+            for (int num_edge = 0; num_edge < mesh.nb_edges; num_edge++){
+            	
+            	if (
+            	attribute_is_dirichlet.push_back(true);
+            	int edge_attribute = mesh.get_edge_attribute(num_edge);
+            
+            }
+            */
         }
 
     }
