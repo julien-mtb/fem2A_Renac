@@ -135,7 +135,7 @@ namespace FEM2A {
         	std::cout << "" << std::endl;
         	std::cout << "Tests sur la matrice Jacobienne pour un segment;" << std::endl;
         	std::cout << "" << std::endl;
-        	/*
+        	///*
         	
         	ElementMapping mapping2 = ElementMapping(mesh, true, 4);
         	vertex v0_ = mesh.get_edge_vertex(4, 0);
@@ -143,7 +143,7 @@ namespace FEM2A {
         	std::cout << "v0 : x = " << v0_.x << " y = " << v0_.y << std::endl;
         	std::cout << "v1 : x = " << v1_.x << " y = " << v1_.y << std::endl;
         	
-        	*/
+        	//*/
         	/*
         	int dim = 2;
         	int order = 1;
@@ -171,6 +171,21 @@ namespace FEM2A {
         	SparseMatrix K(mesh.nb_vertices());
         	int t = 4;
         	local_to_global_matrix(mesh, t, Ke, K);
+        	
+        	std::vector <double> Fe;
+        	assemble_elementary_vector(mapping, ref_functions, quadrature, unit_fct, Fe);
+        	for (int i = 0; i < Fe.size() ; i++) {
+        		std::cout << "Fe " << i << " : " << Fe[i] << std::endl;
+        	}
+        	
+        	std::vector <double> Fe2;
+        	ShapeFunctions ref_functions_1D(1, 1);
+        	Quadrature quadrature_1D = quadrature_1D.get_quadrature(2, true);
+        	assemble_elementary_neumann_vector(mapping2, ref_functions_1D, quadrature_1D, unit_fct, Fe2);
+        	std::cout << "Vecteur conditions de Neumann : " << std::endl;
+        	for (int i = 0; i < Fe2.size() ; i++) {
+        		std::cout << "Fe " << i << " : " << Fe2[i] << std::endl;
+        	}
         	
         	return true;
         }

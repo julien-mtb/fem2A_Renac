@@ -213,14 +213,18 @@ namespace FEM2A {
         // std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
         // TODO
         DenseMatrix J = jacobian_matrix(x_r);
-        double determinant;
+        double determinant = 0;
         if (border_) {
-        	determinant = pow(pow(J.get(0, 0), 2) + pow(J.get(1, 0), 2), 1/2);
+        	// std::cout << "J[0] : " << J.get(0, 0) << " , J[1] : " << J.get(1, 0) << std::endl;
+        	// std::cout << "calcul pow : " << pow(J.get(0, 0), 2) << " ; " << pow(J.get(1, 0), 2) << std::endl;
+        	// std::cout << "calcul final : " << pow(pow(J.get(0, 0), 2) + pow(J.get(1, 0), 2), 0.5) << std::endl;
+        	determinant = pow(pow(J.get(0, 0), 2) + pow(J.get(1, 0), 2), 0.5);
+        	// std::cout << "det de vecteurs, on a det = " << determinant << std::endl;
         }
         
         else {
         	determinant = J.get(0, 0)*J.get(1, 1) - J.get(1, 0)*J.get(0, 1);
-       		
+       		// std::cout << "On est passé par cet endoit, on a det = " << determinant << std::endl;
         }
         // return 0;
         return determinant;
@@ -252,9 +256,16 @@ namespace FEM2A {
     {
         // std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
         ///*
-        if (i==0) return 1-x_r.x - x_r.y;
-        if (i==1) return x_r.x;
-        if (i==2) return x_r.y;
+        if (dim_ == 2) {
+        	if (i==0) return 1-x_r.x - x_r.y;
+        	if (i==1) return x_r.x;
+        	if (i==2) return x_r.y;
+        }
+        if (dim_ == 1) {
+        	std::cout << "shape function de dim 1" << std::endl;
+        	if (i==0) return 1-x_r.x;
+        	if (i==1) return x_r.x;
+        }
         //*/
         // TODO
         return 0. ; // should not be reached
@@ -376,6 +387,15 @@ namespace FEM2A {
     {
         std::cout << "compute elementary vector (source term)" << '\n';
         // TODO
+        double calcul;
+        for (int i = 0; i < reference_functions.nb_functions(); i++) {
+        	calcul = 0;
+        	for (int q = 0; q < quadrature.nb_points(); q++) {
+        		vertex v = quadrature.point(q);
+        		calcul += quadrature.weight(q)*reference_functions.evaluate(i, v)*elt_mapping.jacobian(v)*source(v);
+        	}        	
+        	Fe.push_back(calcul);
+        }
     }
 
     void assemble_elementary_neumann_vector(
@@ -387,6 +407,16 @@ namespace FEM2A {
     {
         std::cout << "compute elementary vector (neumann condition)" << '\n';
         // TODO
+        double calcul;
+        for (int i = 0; i < reference_functions_1D.nb_functions(); i++) {
+        	calcul = 0;
+        	for (int q = 0; q < quadrature_1D.nb_points(); q++) {
+        		vertex v = quadrature_1D.point(q);
+        		calcul += quadrature_1D.weight(q)*reference_functions_1D.evaluate(i, v)*elt_mapping_1D.jacobian(v)*neumann(v);
+        		std::cout << "i : " << i << " , q : " << q << " calcul : " << calcul << std::endl;
+        	}        	
+        	Fe.push_back(calcul);
+    	}
     }
 
     void local_to_global_vector(
@@ -397,7 +427,12 @@ namespace FEM2A {
         std::vector< double >& F )
     {
         std::cout << "Fe -> F" << '\n';
+        int nb_lignes = Fe.size();
+        for (int l = 0; i < nb_lignes; i++){
+        	F[M.get_edge_vertex_index(i, l)] += Fe[l];
+        }
         // TODO
+        
     }
 
     void apply_dirichlet_boundary_conditions(
@@ -409,6 +444,8 @@ namespace FEM2A {
     {
         std::cout << "apply dirichlet boundary conditions" << '\n';
         // TODO
+        int P = 10000;
+        
     }
 
     void solve_poisson_problem(
