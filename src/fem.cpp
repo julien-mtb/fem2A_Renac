@@ -345,7 +345,7 @@ namespace FEM2A {
         // TODO
     }
 
-    void local_to_global_matrix(
+    void local_to_global_matrix_v2(
         const Mesh& M,
         int t,
         const DenseMatrix& Ke,
@@ -361,7 +361,7 @@ namespace FEM2A {
 	///*
         int nb_lignes = Ke.height();
         int nb_colonnes = Ke.width();
-        for ( int i = 0; i < nb_lignes; i++){
+        for ( int i = 0; i < nb_colonnes; i++){
         	for (int j = 0; j <= i; j++){
         		K.add(M.get_triangle_vertex_index(t, i), M.get_triangle_vertex_index(t, j), Ke.get(i, j));
         		
@@ -370,6 +370,21 @@ namespace FEM2A {
         }
         //*/
         // TODO
+    }
+    
+        void local_to_global_matrix(
+        const Mesh& M,
+        int t,
+        const DenseMatrix& Ke,
+        SparseMatrix& K )
+    {
+	for( int li = 0; li < Ke.height(); ++li ) {
+		int i = M.get_triangle_vertex_index(t, li);
+		for( int lj = 0; lj < Ke.width(); ++lj ) {
+			int j = M.get_triangle_vertex_index(t, lj);
+			K.add(i, j, Ke.get(li, lj));
+		}
+	}
     }
 
     void assemble_elementary_vector(
@@ -447,11 +462,11 @@ namespace FEM2A {
         std::cout << "apply dirichlet boundary conditions" << '\n';
         // TODO
         int Pen_coeff = 10000;
-        // La condition de dirichlet est imposée pour deux points, il faut donc gérer si on a déja pris en compte ou pas
+        // La condition de dirichlet est imposée sur des segments, ces derniers peuvent avoir des points en commun, il faut donc gérer si on a déja pris en compte ou pas
         // Pour ne pas passer deux fois sur les points -> utilisation d'un vecteur de booléens
         std::vector <bool> processed_vertices(values.size(), false);
         assert(values.size() == M.nb_vertices());
-        for (int edge = 0; edge < M.nb_vertices(); edge++) {
+        for (int edge = 0; edge < M.nb_edges(); edge++) {
         	int edge_attribute = M.get_edge_attribute(edge);
         	if (attribute_is_dirichlet[edge_attribute]) {
         		for (int vertice = 0; vertice < 2; vertice++){
