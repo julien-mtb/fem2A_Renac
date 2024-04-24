@@ -47,14 +47,27 @@ void run_tests()
 void run_simu()
 {
 
-    const bool simu_pure_dirichlet = true;
+    const bool simu_pure_dirichlet = false;
+    const bool simu_dirichlet_et_terme_source = false;
+    const bool simu_dirichlet_sinus_bump = false;
+    const bool simu_dirichlet_neumann = true;
 
     const bool verbose = flag_is_used( "-v", arguments )
         || flag_is_used( "--verbose", arguments );
 
     if( simu_pure_dirichlet ) {
-        Simu::pure_dirichlet_pb("data/square.mesh", verbose);
+        Simu::pure_dirichlet_pb("data/square_fine.mesh", verbose);
     }
+    if (simu_dirichlet_et_terme_source) {
+    	Simu::dirichlet_terme_source_pb("data/square_fine.mesh", verbose);
+    }
+    if (simu_dirichlet_sinus_bump) {
+    	Simu::dirichlet_terme_source_pb_sinus_bump("data/square_fine.mesh", verbose);
+    }
+    if (simu_dirichlet_neumann) {
+    	Simu::dirichlet_neumann_pb("data/square.mesh", verbose);
+    }
+    
 }
 
 int main( int argc, const char * argv[] )

@@ -277,7 +277,7 @@ namespace FEM2A {
         	if (i==2) return x_r.y;
         }
         if (dim_ == 1) {
-        	std::cout << "shape function de dim 1" << std::endl;
+        	// std::cout << "shape function de dim 1" << std::endl;
         	if (i==0) return 1-x_r.x;
         	if (i==1) return x_r.x;
         }
@@ -337,7 +337,7 @@ namespace FEM2A {
         		for (int q = 0; q < quadrature.nb_points(); q++){
         			vertex v = quadrature.point(q);
         			scal = dot(elt_mapping.jacobian_matrix(v).invert_2x2().transpose().mult_2x2_2(reference_functions.evaluate_grad(i, v)), elt_mapping.jacobian_matrix(v).invert_2x2().transpose().mult_2x2_2(reference_functions.evaluate_grad(j, v)));
-        			Ke.add(i, j, quadrature.weight(q)*coefficient(v)*scal*elt_mapping.jacobian(v)); 
+        			Ke.add(i, j, quadrature.weight(q)*coefficient(elt_mapping.transform(v))*scal*elt_mapping.jacobian(v)); 
         				
         		}
         	}
@@ -403,10 +403,12 @@ namespace FEM2A {
         	calcul = 0;
         	for (int q = 0; q < quadrature.nb_points(); q++) {
         		vertex v = quadrature.point(q);
-        		calcul += quadrature.weight(q)*reference_functions.evaluate(i, v)*elt_mapping.jacobian(v)*source(v);
-        	}        	
-        	Fe.push_back(calcul);
-        }
+        		
+        		calcul += quadrature.weight(q)*reference_functions.evaluate(i, v)*elt_mapping.jacobian(v)*source(elt_mapping.transform(v));
+        		// std::cout << "i : " << i << " , q : " << q << " calcul : " << calcul << std::endl;
+        	}
+        	Fe.push_back(calcul);        	
+        }        		
     }
 
     void assemble_elementary_neumann_vector(
@@ -425,8 +427,8 @@ namespace FEM2A {
         	calcul = 0;
         	for (int q = 0; q < quadrature_1D.nb_points(); q++) {
         		vertex v = quadrature_1D.point(q);
-        		calcul += quadrature_1D.weight(q)*reference_functions_1D.evaluate(i, v)*elt_mapping_1D.jacobian(v)*neumann(v);
-        		std::cout << "i : " << i << " , q : " << q << " calcul : " << calcul << std::endl;
+        		calcul += quadrature_1D.weight(q)*reference_functions_1D.evaluate(i, v)*elt_mapping_1D.jacobian(v)*neumann(elt_mapping_1D.transform(v));
+        		// std::cout << "i : " << i << " , q : " << q << " calcul : " << calcul << std::endl;
         	}        	
         	Fe.push_back(calcul);
     	}
@@ -442,14 +444,20 @@ namespace FEM2A {
     	/*
         std::cout << "Fe -> F" << '\n';
         */
-        /*
         int nb_lignes = Fe.size();
-        for (int l = 0; i < nb_lignes; i++){
-        	F[M.get_edge_vertex_index(i, l)] += Fe[l];
+        if (border) {
+        	for (int l = 0; l < nb_lignes; l++){
+        		F[M.get_edge_vertex_index(i, l)] += Fe[l];
+        	}	
         }
-        */
-        // TODO
+        else {
+        	for (int l = 0; l < nb_lignes; l++){
+        		// std::cout << "Fe[
+        		F[M.get_triangle_vertex_index(i, l)] += Fe[l];
+        	}
         
+        // TODO
+        }
     }
 
     void apply_dirichlet_boundary_conditions(
@@ -482,7 +490,7 @@ namespace FEM2A {
         }
         
     }
-
+/*
     void solve_poisson_problem(
             const Mesh& M,
             double (*diffusion_coef)(vertex),
@@ -494,8 +502,39 @@ namespace FEM2A {
     {
         std::cout << "solve poisson problem" << '\n';
         // TODO
+        SparseMatrix K_glob(M.nb_vertices());
+        std::vector<double> F_glob(M.nb_vertices());
+        for (int triangle = 0; triangle < M.nb_triangles(); triangle++){
+            ElementMapping mapping(M, false, triangle);
+            ShapeFunctions shpfct(2,1);
+            Quadrature quad = Quadrature::get_quadrature(2);
+            DenseMatrix Ke;
+            assemble_elementary_matrix(mapping, shpfct, quad, unit_fct, Ke);
+            local_to_global_matrix(M, triangle, Ke, K_glob);
+        }
+        for (int vertice = 0; vertice < M.nb_vertices(); vertice++) {
+        	ElementMapping mapping_1D(M, true, vertice);
+        	ShapeFunctions shpfct_1D(1, 1);
+        	Quadrature quad_1D = Quadrature::get_quadrature(2);
+        	std::vector <double> Fe;
+        	
+        	
+        
+        }
+        std::vector<bool> att_is_dirichlet(2, false);
+        att_is_dirichlet[1] = true;
+        mesh.set_attribute(unit_fct, 1, true);
+        std::vector<double> imposed_values(M.nb_vertices());
+        for( int i = 0; i < mesh.nb_vertices(); ++i){
+            imposed_values[i] = xy_fct(M.get_vertex(i));
+        }
+        apply_dirichlet_boundary_conditions(M, att_is_dirichlet, imposed_values, K_glob, F_glob);
+        solve(K_glob, F_glob, solution);
+        std::string export_name = "pure_dirichlet";
+        mesh.save(export_name+".mesh");
+        save_solution(solution, export_name+".bb");
         
         
     }
-
+*/
 }
