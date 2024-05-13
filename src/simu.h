@@ -38,9 +38,9 @@ namespace FEM2A {
         	return sin(M_PI*v.x)*sin(M_PI*v.y);
         }
         
-        double neumann_fct( vertex v)
+        double neumann_fct_2( vertex v)
         {
-        	double epsilon = 0.001;
+        	double epsilon = 0.00000001;
         	if (abs(v.x) < epsilon) {
         		return 1;
         	}
@@ -49,10 +49,27 @@ namespace FEM2A {
         	}
         }
         
+        double neumann_fct_1( vertex v)
+        {
+        	if (abs(v.x - 1.0)<0.00000001) {
+        		return 10;
+        	}
+        	return -10;
+        
+        }
+        
         double neumann_cdt_fct( vertex v)
         {
         	return sin(M_PI*v.y);
         }
+        
+        /*
+        double fond_du_mug_int( vertex v) {
+        	if (abs(v.x) < 0.0000001 && abs(v.y) < 0.0000001) {
+        	
+        	}
+        }
+        */
 
         //#################################
         //  Simulations
@@ -268,8 +285,8 @@ namespace FEM2A {
 
     }
     
-    void dirichlet_neumann_pb( const std::string& mesh_filename, bool verbose)
-        {
+    void dirichlet_neumann_pb( const std::string& mesh_filename, bool verbose) {
+    
             std::cout << "Solving Dirichlet problem with neumann conditions" << std::endl;
             if ( verbose ) {
                 std::cout << " with lots of printed details..." << std::endl;
@@ -279,10 +296,11 @@ namespace FEM2A {
             mesh.load(mesh_filename);
             SparseMatrix K_glob(mesh.nb_vertices());
             std::vector<double> F_glob(mesh.nb_vertices());
-            for (int triangle = 0; triangle < mesh.nb_triangles(); triangle++){
+            std::vector <double> values(mesh.nb_vertices(), 0);
+            for (int triangle = 0; triangle < mesh.nb_triangles(); triangle++) {
             	ElementMapping mapping(mesh, false, triangle);
             	ShapeFunctions shpfct(2,1);
-            	Quadrature quad = Quadrature::get_quadrature(2);
+            	Quadrature quad = Quadrature::get_quadrature(2, false);
             	DenseMatrix Ke;
             	assemble_elementary_matrix(mapping, shpfct, quad, unit_fct, Ke);
             	local_to_global_matrix(mesh, triangle, Ke, K_glob);
@@ -296,37 +314,24 @@ namespace FEM2A {
             	local_to_global_vector(mesh, false, triangle, Fe, F_glob);
            
             }
+            
+            mesh.set_attribute(unit_fct, 0, true);
+            mesh.set_attribute(neumann_fct_1, 2, true);
+            std::vector <bool> att = {false, false, true};
+            apply_dirichlet_boundary_conditions(mesh, att, values, K_glob, F_glob);
+            mesh.set_attribute(neumann_fct_2, 1, true);
+            
             for (int edge_vertex = 0; edge_vertex < mesh.nb_edges(); edge_vertex++) {
-            	ElementMapping mapping_1D(mesh, true, edge_vertex);
-            	ShapeFunctions shpfct_1D(1,1);
-            	Quadrature quad_1D = Quadrature::get_quadrature(2);
-            	std::cout << "nb : " << edge_vertex << std::endl;
-            	for (int local_index = 0; local_index < 2; local_index++) {
-            		if (neumann_fct(mesh.get_edge_vertex(edge_vertex, local_index)) > 0) {
-            			std::cout << "On a un neumann" << std::endl;
-            			std::vector <double> Fe;
-            			assemble_elementary_neumann_vector(mapping_1D, shpfct_1D, quad_1D, neumann_cdt_fct, Fe);
-            			for (int nb = 0; nb < Fe.size(); nb++) {
-            				std::cout << "Fe[ " << nb << " ] : " << Fe[nb] << std::endl;
-            			}
-            			local_to_global_vector(mesh, true, edge_vertex, Fe, F_glob);
-            		}
+            	if (mesh.get_edge_attribute(edge_vertex)==1) {
+            		ElementMapping mapping_1D(mesh, true, edge_vertex);
+            		ShapeFunctions shpfct_1D(1,1);
+            		Quadrature quad_1D = Quadrature::get_quadrature(2, true);
+            		std::vector <double> Fe_2;
+            		assemble_elementary_neumann_vector(mapping_1D, shpfct_1D, quad_1D, neumann_cdt_fct, Fe_2);
+            		local_to_global_vector(mesh, true, edge_vertex, Fe_2, F_glob);
             	}
             }
             
-            /*
-            for (int nb = 0; nb < F_glob.size(); nb++) {
-            	std::cout << "F_glob[ " << nb << " ] : " << F_glob[nb] << std::endl;
-            }
-            */
-            std::vector<bool> att_is_dirichlet(2, false);
-            att_is_dirichlet[1] = true;
-            mesh.set_attribute(unit_fct, 1, true);
-            std::vector<double> imposed_values(mesh.nb_vertices());
-            for( int i = 0; i < mesh.nb_vertices(); ++i){
-            	imposed_values[i] = 0;
-            }
-            apply_dirichlet_boundary_conditions(mesh, att_is_dirichlet, imposed_values, K_glob, F_glob);
             std::vector<double> u(mesh.nb_vertices());
             solve(K_glob, F_glob, u);
 
@@ -336,6 +341,56 @@ namespace FEM2A {
 
 
     }
+    /*
+    void mug_pb(const const std::string& mesh_filename, bool verbose) {
+    
+            std::cout << "Solving Dirichlet problem with neumann conditions" << std::endl;
+            if ( verbose ) {
+                std::cout << " with lots of printed details..." << std::endl;
+            }
+            Mesh mesh;
+            // On charge le maillage
+            mesh.load(mesh_filename);
+            SparseMatrix K_glob(mesh.nb_vertices());
+            std::vector<double> F_glob(mesh.nb_vertices());
+            std::vector <double> values(mesh.nb_vertices(), 0);
+            for (int triangle = 0; triangle < mesh.nb_triangles(); triangle++) {
+            	ElementMapping mapping(mesh, false, triangle);
+            	ShapeFunctions shpfct(2,1);
+            	Quadrature quad = Quadrature::get_quadrature(2, false);
+            	DenseMatrix Ke;
+            	assemble_elementary_matrix(mapping, shpfct, quad, unit_fct, Ke);
+            	local_to_global_matrix(mesh, triangle, Ke, K_glob);
+            }
+            
+            mesh.set_attribute(unit_fct, 0, true);
+            mesh.set_attribute(fond_du_mug, 2, true);
+            std::vector <bool> att = {false, false, true};
+            apply_dirichlet_boundary_conditions(mesh, att, values, K_glob, F_glob);
+            
+
+            
+            for (int edge_vertex = 0; edge_vertex < mesh.nb_edges(); edge_vertex++) {
+            	if (mesh.get_edge_attribute(edge_vertex)==1) {
+            		ElementMapping mapping_1D(mesh, true, edge_vertex);
+            		ShapeFunctions shpfct_1D(1,1);
+            		Quadrature quad_1D = Quadrature::get_quadrature(2, true);
+            		std::vector <double> Fe_2;
+            		assemble_elementary_neumann_vector(mapping_1D, shpfct_1D, quad_1D, neumann_cdt_fct, Fe_2);
+            		local_to_global_vector(mesh, true, edge_vertex, Fe_2, F_glob);
+            	}
+            }
+            
+            std::vector<double> u(mesh.nb_vertices());
+            solve(K_glob, F_glob, u);
+
+            std::string export_name = "mug_pb";
+            mesh.save(export_name+".mesh");
+            save_solution(u, export_name+".bb");
+
+
+    }
+    */
 
 }
 }
