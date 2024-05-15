@@ -33,9 +33,9 @@ void run_tests()
     const bool t_lmesh = false;
     const bool t_io = false;
     const bool t_quad = false;
-    const bool t_map = false;
+    const bool t_map = true;
     const bool t_dir = false;
-    const bool t_Fe = true;
+    const bool t_Fe = false;
 
     if( t_opennl ) test_opennl();
     if( t_lmesh ) Tests::test_load_mesh();

@@ -83,7 +83,7 @@ namespace FEM2A {
         	std::cout << "nombre de points dans la quadrature : " << nb_pts3 << std::endl;
         	double poids3 = 0;
         	for (int i=0; i < nb_pts3; ++i){
-        		poids2 += quad3.weight(i);
+        		poids3 += quad3.weight(i);
         	}
         	std::cout << "poids quadrature : " << poids3 << std::endl;
         	
