@@ -77,6 +77,24 @@ namespace FEM2A {
         		poids2 += quad2.weight(i);
         	}
         	std::cout << "poids quadrature : " << poids2 << std::endl;
+        	
+        	Quadrature quad3 = quad3.get_quadrature(4);
+        	int nb_pts3 = quad3.nb_points();
+        	std::cout << "nombre de points dans la quadrature : " << nb_pts3 << std::endl;
+        	double poids3 = 0;
+        	for (int i=0; i < nb_pts3; ++i){
+        		poids2 += quad3.weight(i);
+        	}
+        	std::cout << "poids quadrature : " << poids3 << std::endl;
+        	
+        	Quadrature quad4 = quad4.get_quadrature(6);
+        	int nb_pts4 = quad4.nb_points();
+        	std::cout << "nombre de points dans la quadrature : " << nb_pts4 << std::endl;
+        	double poids4 = 0;
+        	for (int i=0; i < nb_pts4; ++i){
+        		poids4 += quad4.weight(i);
+        	}
+        	std::cout << "poids quadrature : " << poids4 << std::endl;
         	return true;
         	
         
@@ -116,7 +134,7 @@ namespace FEM2A {
         	
         	image_point1 = mapping.transform(point1);
         	
-        	std::cout << "Position x : " << image_point1.x << " ; position y : " << image_point1.y << std::endl;
+        	std::cout << "Les positions transformées sont : Position x : " << image_point1.x << " ; position y : " << image_point1.y << std::endl;
         	
         	std::cout << "" << std::endl;
         	std::cout << "Tests sur la matrice Jacobienne pour le triangle;" << std::endl;
@@ -186,7 +204,6 @@ namespace FEM2A {
         	for (int i = 0; i < Fe2.size() ; i++) {
         		std::cout << "Fe " << i << " : " << Fe2[i] << std::endl;
         	}
-        	
         	return true;
         }
         
@@ -196,7 +213,7 @@ namespace FEM2A {
             	mesh.load("data/square.mesh");
             	ElementMapping my_map(mesh, false, 4);
             	ShapeFunctions my_shpfct(2, 1);
-            	Quadrature my_quad = Quadrature::get_quadrature(2);
+            	Quadrature my_quad = Quadrature::get_quadrature(2, false);
             	DenseMatrix Ke;
             	assemble_elementary_matrix(my_map, my_shpfct, my_quad, unit_fct, Ke);
             	Ke.print();
@@ -214,6 +231,26 @@ namespace FEM2A {
         	*/
         	return true;
         }
+        
+        bool test_Fe() {
+        	Mesh mesh;
+        	mesh.load("data/square.mesh");
+        	ElementMapping mapping(mesh, false, 4);
+        	ShapeFunctions shp_fct(2, 1);
+        	Quadrature my_quad = Quadrature::get_quadrature(2, false);
+        	std::vector<double> F(mesh.nb_vertices(), 0);
+        	std::vector<double> Fe;
+        	assemble_elementary_vector(mapping, shp_fct, my_quad, unit_fct, Fe);
+        	local_to_global_vector(mesh, false, 4, Fe, F);
+        	std::cout << "global_vector : " << std::endl;
+        	for ( int i = 0; i < F.size(); i++) {
+        		std::cout << "i : " << i << " : " << F[i] << std::endl;
+        	}
+        	
+        	return true;
+        }
+        
+        
     }
 
 }

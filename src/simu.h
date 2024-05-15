@@ -54,7 +54,9 @@ namespace FEM2A {
         	if (abs(v.x - 1.0)<0.00000001) {
         		return 10;
         	}
-        	return -10;
+        	else {
+        		return -10;
+        	}
         
         }
         
@@ -87,7 +89,7 @@ namespace FEM2A {
             mesh.load(mesh_filename);
             
             ShapeFunctions ref_functions(2, 1);
-            Quadrature quadrature = quadrature.get_quadrature(2);
+            Quadrature quadrature = quadrature.get_quadrature(2, false);
             
             std::vector <double> F(mesh.nb_vertices());
             std::vector <double> U(mesh.nb_vertices());
@@ -156,7 +158,7 @@ namespace FEM2A {
             for (int triangle = 0; triangle < mesh.nb_triangles(); triangle++){
             	ElementMapping mapping(mesh, false, triangle);
             	ShapeFunctions shpfct(2,1);
-            	Quadrature quad = Quadrature::get_quadrature(2);
+            	Quadrature quad = Quadrature::get_quadrature(2, false);
             	DenseMatrix Ke;
             	assemble_elementary_matrix(mapping, shpfct, quad, unit_fct, Ke);
             	local_to_global_matrix(mesh, triangle, Ke, K_glob);
@@ -190,7 +192,7 @@ namespace FEM2A {
             for (int triangle = 0; triangle < mesh.nb_triangles(); triangle++){
             	ElementMapping mapping(mesh, false, triangle);
             	ShapeFunctions shpfct(2,1);
-            	Quadrature quad = Quadrature::get_quadrature(2);
+            	Quadrature quad = Quadrature::get_quadrature(2, false);
             	DenseMatrix Ke;
             	assemble_elementary_matrix(mapping, shpfct, quad, unit_fct, Ke);
             	local_to_global_matrix(mesh, triangle, Ke, K_glob);
@@ -239,7 +241,7 @@ namespace FEM2A {
             for (int triangle = 0; triangle < mesh.nb_triangles(); triangle++){
             	ElementMapping mapping(mesh, false, triangle);
             	ShapeFunctions shpfct(2,1);
-            	Quadrature quad = Quadrature::get_quadrature(2);
+            	Quadrature quad = Quadrature::get_quadrature(6, false);
             	DenseMatrix Ke;
             	assemble_elementary_matrix(mapping, shpfct, quad, unit_fct, Ke);
             	local_to_global_matrix(mesh, triangle, Ke, K_glob);
@@ -276,10 +278,10 @@ namespace FEM2A {
             
             
             std::cout << "square error : " << square_error << std::endl;
-            std::string export_name = "dirichlet_sinus_bump_fine";
+            std::string export_name = "dirichlet_sinus_bump_6";
             mesh.save(export_name+".mesh");
             save_solution(u, export_name+".bb");
-            std::string export_name2 = "dirichlet_sinus_bump_ecart_fine";
+            std::string export_name2 = "dirichlet_sinus_bump_ecart_6";
             mesh.save(export_name2+".mesh");
             save_solution(ecart, export_name2+".bb");
 
@@ -300,7 +302,7 @@ namespace FEM2A {
             for (int triangle = 0; triangle < mesh.nb_triangles(); triangle++) {
             	ElementMapping mapping(mesh, false, triangle);
             	ShapeFunctions shpfct(2,1);
-            	Quadrature quad = Quadrature::get_quadrature(2, false);
+            	Quadrature quad = Quadrature::get_quadrature(6, false);
             	DenseMatrix Ke;
             	assemble_elementary_matrix(mapping, shpfct, quad, unit_fct, Ke);
             	local_to_global_matrix(mesh, triangle, Ke, K_glob);
@@ -335,7 +337,7 @@ namespace FEM2A {
             std::vector<double> u(mesh.nb_vertices());
             solve(K_glob, F_glob, u);
 
-            std::string export_name = "dirichlet_neumann_square";
+            std::string export_name = "dirichlet_neumann_square_6_fine";
             mesh.save(export_name+".mesh");
             save_solution(u, export_name+".bb");
 

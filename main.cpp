@@ -34,7 +34,8 @@ void run_tests()
     const bool t_io = false;
     const bool t_quad = false;
     const bool t_map = false;
-    const bool t_dir = true;
+    const bool t_dir = false;
+    const bool t_Fe = true;
 
     if( t_opennl ) test_opennl();
     if( t_lmesh ) Tests::test_load_mesh();
@@ -42,6 +43,7 @@ void run_tests()
     if(t_quad) Tests::test_quadrature();
     if(t_map) Tests::test_mapping();
     if(t_dir) Tests::test_Ke();
+    if(t_Fe) Tests::test_Fe();
 }
 
 void run_simu()
@@ -62,10 +64,10 @@ void run_simu()
     	Simu::dirichlet_terme_source_pb("data/square_fine.mesh", verbose);
     }
     if (simu_dirichlet_sinus_bump) {
-    	Simu::dirichlet_terme_source_pb_sinus_bump("data/square_fine.mesh", verbose);
+    	Simu::dirichlet_terme_source_pb_sinus_bump("data/square.mesh", verbose);
     }
     if (simu_dirichlet_neumann) {
-    	Simu::dirichlet_neumann_pb("data/square.mesh", verbose);
+    	Simu::dirichlet_neumann_pb("data/square_fine.mesh", verbose);
     }
     
 }
